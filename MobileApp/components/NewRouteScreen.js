@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, Alert } from "react-native"; // Import Alert
 import * as ImagePicker from "expo-image-picker";
-import { styles } from "./styles";
+import { styles } from "./Styles";
 
 export function NewRouteScreen() {
   const [permission, requestPermission] = ImagePicker.useCameraPermissions();
