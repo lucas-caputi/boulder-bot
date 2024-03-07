@@ -4,8 +4,8 @@ import cv2
 import numpy as np
 
 # Image and model paths
-model_path = '/home/lcaputi/temp/image-segmentation-yolov8/last.pt'
-image_path = '/home/lcaputi/temp/image-segmentation-yolov8/test_image.jpg'
+model_path = './last.pt'
+image_path = './test_image.jpg'
 
 # Read the image
 img = cv2.imread(image_path)
@@ -27,7 +27,7 @@ for result in results:
         draw.polygon(polygon, outline=(0, 255, 0), width=5)             # Draw the polygon outline with given color and thickness
         img = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)        # Convert the modified image back to OpenCV format (BGR)
     img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))     # Convert the image from OpenCV format (BGR) to PIL format (RGB)
-    output_image_path = '/home/lcaputi/temp/image-segmentation-yolov8/output_image.jpg'
+    output_image_path = './output_image.jpg'
     img_pil.save(output_image_path)    
 
     # NORMAL OUTPUT
