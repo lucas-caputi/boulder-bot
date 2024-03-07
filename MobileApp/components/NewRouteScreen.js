@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { styles } from "./Styles";
+import * as MediaLibrary from "expo-media-library";
 
 export function NewRouteScreen() {
+  const [imageDone, setImageDone] = useState(false);
   const [imageUri, setImageUri] = useState(null);
 
   const uploadImage = async (uri) => {
@@ -17,7 +19,7 @@ export function NewRouteScreen() {
       });
 
       const response = await axios.post(
-        "http://192.168.1.65:5000/segment",
+        "http://192.168.1.222:2222/segment",
         formData
       );
 
@@ -25,6 +27,7 @@ export function NewRouteScreen() {
         console.log("Succesfully received image back from server");
         const decodedImage = `data:image/jpeg;base64, ${response.data.image}`;
         setImageUri(decodedImage);
+        setImageDone(true);
       } else {
         Alert.alert("Error", "Failed to receive image from server");
       }
@@ -35,6 +38,8 @@ export function NewRouteScreen() {
   };
 
   const takeImage = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+
     let data = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
@@ -53,10 +58,23 @@ export function NewRouteScreen() {
     });
 
     if (!data.cancelled) {
+      setImageDone(false);
       setImageUri(data.assets[0].uri);
       uploadImage(data.assets[0].uri);
     }
   };
+
+  const saveImage = async () => {
+    // try {
+    //   let data = await MediaLibrary.saveToLibraryAsync(imageUri);
+    //   if (data) {
+    //     Alert.alert("Success", "Image saved to library");
+    //   }
+    // } catch (error) {
+    //   console.error("Error saving image:", error);
+    //   Alert.alert("Error", "Failed to save image");
+    // }
+  }
 
   return (
     <View style={styles.container}>
@@ -64,6 +82,9 @@ export function NewRouteScreen() {
         <Image style={{ width: 300, height: 400 }} source={{ uri: imageUri }} />
       )}
       <Text></Text>
+      {imageDone && <TouchableOpacity style={styles.button} onPress={saveImage}>
+        <Text style={styles.buttonText}>Save image</Text>
+      </TouchableOpacity>}
       <TouchableOpacity style={styles.button} onPress={takeImage}>
         <Text style={styles.buttonText}>Take an image</Text>
       </TouchableOpacity>
