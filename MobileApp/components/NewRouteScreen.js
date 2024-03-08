@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, Image, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  Alert,
+  TouchableWithoutFeedback,
+} from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { styles } from "./Styles";
@@ -8,6 +15,21 @@ import * as MediaLibrary from "expo-media-library";
 export function NewRouteScreen() {
   const [imageDone, setImageDone] = useState(false);
   const [imageUri, setImageUri] = useState(null);
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    if (imageUri) {
+      Image.getSize(
+        imageUri,
+        (width, height) => {
+          setImageSize({ width, height });
+        },
+        (error) => {
+          console.error("Error getting image size:", error);
+        }
+      );
+    }
+  }, [imageUri]);
 
   const uploadImage = async (uri) => {
     try {
@@ -19,7 +41,7 @@ export function NewRouteScreen() {
       });
 
       const response = await axios.post(
-        "http://192.168.1.222:2222/segment",
+        "http://192.168.1.65:5000/segment",
         formData
       );
 
@@ -45,7 +67,7 @@ export function NewRouteScreen() {
       quality: 1,
     });
 
-    if (!data.cancelled) {
+    if (!data.canceled) {
       setImageUri(data.assets[0].uri);
       uploadImage(data.assets[0].uri);
     }
@@ -57,7 +79,7 @@ export function NewRouteScreen() {
       quality: 1,
     });
 
-    if (!data.cancelled) {
+    if (!data.canceled) {
       setImageDone(false);
       setImageUri(data.assets[0].uri);
       uploadImage(data.assets[0].uri);
@@ -74,23 +96,48 @@ export function NewRouteScreen() {
     //   console.error("Error saving image:", error);
     //   Alert.alert("Error", "Failed to save image");
     // }
-  }
+  };
+
+  const handleImagePress = (event) => {
+    const { locationX, locationY } = event.nativeEvent;
+    const { width, height } = imageSize;
+    const relativeX = Math.floor((locationX / 300) * width);
+    const relativeY = Math.floor((locationY / 400) * height);
+    console.log("Image clicked at:", relativeX, relativeY);
+  };
 
   return (
     <View style={styles.container}>
       {imageUri && (
-        <Image style={{ width: 300, height: 400 }} source={{ uri: imageUri }} />
+        <TouchableWithoutFeedback onPress={handleImagePress}>
+          <Image
+            style={{ width: 300, height: 400, marginTop: -100 }}
+            source={{ uri: imageUri }}
+          />
+        </TouchableWithoutFeedback>
       )}
-      <Text></Text>
-      {imageDone && <TouchableOpacity style={styles.button} onPress={saveImage}>
-        <Text style={styles.buttonText}>Save image</Text>
-      </TouchableOpacity>}
-      <TouchableOpacity style={styles.button} onPress={takeImage}>
-        <Text style={styles.buttonText}>Take an image</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={pickImage}>
-        <Text style={styles.buttonText}>Upload an image</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonsContainer}>
+        {imageDone && (
+          <TouchableOpacity style={styles.button} onPress={saveImage}>
+            <Image
+              style={{ height: 50, width: 50 }}
+              source={require("../assets/save.png")}
+            />
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity style={styles.button} onPress={takeImage}>
+          <Image
+            style={{ height: 50, width: 50 }}
+            source={require("../assets/camera.png")}
+          />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={pickImage}>
+          <Image
+            style={{ height: 50, width: 50 }}
+            source={require("../assets/gallery.png")}
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

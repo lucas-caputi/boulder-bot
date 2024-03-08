@@ -19,14 +19,21 @@ export const styles = StyleSheet.create({
     alignItems: "center",
   },
   button: {
+    justifyContent: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+  },
+  buttonText: {
+    fontSize: 15,
+    color: "black",
+  },
+  buttonsContainer: {
     borderColor: "#f4511e",
     borderRadius: 15,
     borderWidth: 2,
-    padding: 10,
-    marginBottom: 10,
-  },
-  buttonText: {
-    fontSize: 18,
-    color: "black",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 30,
+    marginBottom: -30,
   },
 });
