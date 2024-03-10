@@ -13,6 +13,7 @@ import { styles } from "./Styles";
 import * as MediaLibrary from "expo-media-library";
 
 export function NewRouteScreen() {
+  const [imageUploaded, setImageUploaded] = useState(false);
   const [imageDone, setImageDone] = useState(false);
   const [imageUri, setImageUri] = useState(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -68,6 +69,8 @@ export function NewRouteScreen() {
     });
 
     if (!data.canceled) {
+      setImageDone(false);
+      setImageUploaded(true);
       setImageUri(data.assets[0].uri);
       uploadImage(data.assets[0].uri);
     }
@@ -81,6 +84,7 @@ export function NewRouteScreen() {
 
     if (!data.canceled) {
       setImageDone(false);
+      setImageUploaded(true);
       setImageUri(data.assets[0].uri);
       uploadImage(data.assets[0].uri);
     }
@@ -108,6 +112,26 @@ export function NewRouteScreen() {
 
   return (
     <View style={styles.container}>
+      {!imageUploaded && (
+        <View style={{ ...styles.textContainer }}>
+          <Text style={{ textAlign: "center" }}>Upload an image to begin.</Text>
+        </View>
+      )}
+      {imageUploaded && !imageDone && (
+        <View style={{ ...styles.textContainer }}>
+          <Text style={{ textAlign: "center" }}>
+            Processing image with detection model. Please wait...
+          </Text>
+        </View>
+      )}
+      {imageDone && (
+        <View style={{ ...styles.textContainer }}>
+          <Text style={{ textAlign: "center" }}>
+            Image processing done!{"\n"}Create your route by tapping on the
+            image.
+          </Text>
+        </View>
+      )}
       {imageUri && (
         <TouchableWithoutFeedback onPress={handleImagePress}>
           <Image

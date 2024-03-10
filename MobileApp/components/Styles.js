@@ -36,4 +36,11 @@ export const styles = StyleSheet.create({
     marginTop: 30,
     marginBottom: -30,
   },
+  textContainer: {
+    position: "absolute",
+    alignItems: "center",
+    textAlign: "center",
+    width: 300,
+    top: 30,
+  },
 });
