@@ -9,8 +9,9 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
-import { styles } from "./Styles";
+import { styles } from "./Styles.js";
 import * as MediaLibrary from "expo-media-library";
+import ZoomableImage from "./ZoomableImage.js";
 
 export function NewRouteScreen() {
   const [imageUploaded, setImageUploaded] = useState(false);
@@ -134,10 +135,7 @@ export function NewRouteScreen() {
       )}
       {imageUri && (
         <TouchableWithoutFeedback onPress={handleImagePress}>
-          <Image
-            style={{ width: 300, height: 400, marginTop: -100 }}
-            source={{ uri: imageUri }}
-          />
+          <ZoomableImage imageUrl={imageUri} />
         </TouchableWithoutFeedback>
       )}
       <View style={styles.buttonsContainer}>
