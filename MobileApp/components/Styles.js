@@ -27,6 +27,10 @@ export const styles = StyleSheet.create({
     fontSize: 15,
     color: "black",
   },
+  text: {
+    justifyContent: "center",
+    textAlign: "center",
+  },
   buttonsContainer: {
     borderColor: "#f4511e",
     borderRadius: 15,
@@ -51,5 +55,19 @@ export const styles = StyleSheet.create({
   image: {
     width: 300,
     height: 400,
+  },
+  savedRouteScreen: {
+    flex: 1,
+    marginBottom: 150,
+  },
+  scrollContainer: {
+    alignItems: "center",
+  },
+  imageScrollContainer: {
+    padding: 20,
+  },
+  routeName: {
+    textAlign: "center",
+    fontSize: 30,
   },
 });
