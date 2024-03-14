@@ -12,6 +12,7 @@ import axios from "axios";
 import { styles } from "./Styles.js";
 import * as MediaLibrary from "expo-media-library";
 import PanPinchView from "react-native-pan-pinch-view";
+import * as FileSystem from "expo-file-system";
 
 export function NewRouteScreen() {
   const [imageUploaded, setImageUploaded] = useState(false);
@@ -92,15 +93,46 @@ export function NewRouteScreen() {
   };
 
   const saveImage = async () => {
-    // try {
-    //   let data = await MediaLibrary.saveToLibraryAsync(imageUri);
-    //   if (data) {
-    //     Alert.alert("Success", "Image saved to library");
-    //   }
-    // } catch (error) {
-    //   console.error("Error saving image:", error);
-    //   Alert.alert("Error", "Failed to save image");
-    // }
+    if (imageUri) {
+      try {
+        const base64 = imageUri.split(",")[1];
+
+        // Prompt the user for a filename
+        Alert.prompt(
+          "Save Route",
+          "Enter the name of your route:",
+          async (fileName) => {
+            if (fileName) {
+              await saveImageWithFilename(fileName, base64);
+            } else {
+              Alert.alert("Error", "Filename cannot be empty");
+            }
+          }
+        );
+      } catch (error) {
+        console.error("Error saving image:", error);
+        Alert.alert("Error", "Failed to save image");
+      }
+    } else {
+      Alert.alert("Error", "No image to save");
+    }
+  };
+
+  const saveImageWithFilename = async (fileName, base64) => {
+    try {
+      const fileUri = FileSystem.documentDirectory + fileName + ".jpg";
+
+      await FileSystem.writeAsStringAsync(fileUri, base64, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      console.log(fileUri);
+
+      Alert.alert("Success", "Image saved to Saved Routes Tab!");
+    } catch (error) {
+      console.error("Error saving image:", error);
+      Alert.alert("Error", "Failed to save image");
+    }
   };
 
   const handleImagePress = (event) => {
