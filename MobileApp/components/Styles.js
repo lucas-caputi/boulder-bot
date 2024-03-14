@@ -43,18 +43,13 @@ export const styles = StyleSheet.create({
     width: 300,
     top: 30,
   },
-  zoomableImageContainer: {
-    justifyContent: "center",
+  imageContainer: {
+    position: "absolute",
     alignItems: "center",
-    backgroundColor: "#ffffff",
+    top: 50,
+  },
+  image: {
     width: 300,
     height: 400,
-    marginTop: -100,
-    overflow: "hidden",
-  },
-  zoomableImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "contain",
   },
 });

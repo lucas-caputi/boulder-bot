@@ -11,7 +11,7 @@ import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { styles } from "./Styles.js";
 import * as MediaLibrary from "expo-media-library";
-import ZoomableImage from "./ZoomableImage.js";
+import PanPinchView from "react-native-pan-pinch-view";
 
 export function NewRouteScreen() {
   const [imageUploaded, setImageUploaded] = useState(false);
@@ -121,7 +121,8 @@ export function NewRouteScreen() {
       {imageUploaded && !imageDone && (
         <View style={{ ...styles.textContainer }}>
           <Text style={{ textAlign: "center" }}>
-            Processing image with detection model. Please wait...
+            Processing image with detection model. This may take some time,
+            please wait...
           </Text>
         </View>
       )}
@@ -133,11 +134,25 @@ export function NewRouteScreen() {
           </Text>
         </View>
       )}
-      {imageUri && (
-        <TouchableWithoutFeedback onPress={handleImagePress}>
-          <ZoomableImage imageUrl={imageUri} />
-        </TouchableWithoutFeedback>
-      )}
+      <View style={{ marginTop: -90 }}>
+        {imageUri && (
+          <PanPinchView
+            style={{ ...styles.imageContainer, marginTop: 20 }}
+            minScale={1}
+            initialScale={1}
+            containerDimensions={{
+              width: 300,
+              height: 400,
+            }}
+            contentDimensions={{ width: 300, height: 400 }}
+          >
+            <TouchableWithoutFeedback onPress={handleImagePress}>
+              <Image style={[styles.image]} source={{ uri: imageUri }} />
+            </TouchableWithoutFeedback>
+          </PanPinchView>
+        )}
+      </View>
+
       <View style={styles.buttonsContainer}>
         {imageDone && (
           <TouchableOpacity style={styles.button} onPress={saveImage}>
