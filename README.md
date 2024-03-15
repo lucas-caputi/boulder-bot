@@ -7,7 +7,7 @@ The app allows climbers to create custom bouldering routes using pre-existing cl
 Our backend leverages a YOLOv8 instance segmentation model trained on a custom dataset, which can detect and outline climbing holds in an image.
 
 ## Demo
-Please note this demo represents the current stage of development and not the finished project. \
+Please note this demo represents the current stage of development and not the finished project.
  
 ![Alt Text](https://github.com/lucas-caputi/climbing-route-detection/blob/main/assets/demo.gif)
 
