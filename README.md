@@ -1,4 +1,4 @@
-# Climbing Route Detection (CPE Senior Project)
+# Boulder Bot (CPE Senior Project)
 **NOTE: This project is still in progress, expected finish date is early June 2024.** \
 \
 This repository contains a mobile app built with React Native and a backend built with Python using the Flask framework. \
