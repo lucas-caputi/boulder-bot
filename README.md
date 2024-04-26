@@ -11,7 +11,7 @@ Our backend leverages a YOLOv8 instance segmentation model trained on a custom d
 
 Please note this demo represents the current stage of development and not the finished project.
 
-![Alt Text](https://github.com/lucas-caputi/climbing-route-detection/blob/main/assets/demo.gif)
+![Alt Text](https://https://github.com/lucas-caputi/boulder-bot/blob/main/assets/demo.gif)
 
 ## TODO
 
