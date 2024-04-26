@@ -34,6 +34,7 @@ export function NewRouteScreen() {
     }
   }, [imageUri]);
 
+  /* sends request with image to backend and gets back the fully annotated image */
   const uploadImage = async (uri) => {
     try {
       let formData = new FormData();
@@ -62,6 +63,40 @@ export function NewRouteScreen() {
     }
   };
 
+  /* sends request to backend server with current image as well as x and y position of pixel clicked.
+   * gets back image with click
+   */
+  const sendPixelClick = async (uri, x, y) => {
+    try {
+      let formData = new FormData();
+      formData.append("image", {
+        uri: uri,
+        name: "image.jpg",
+        type: "image/jpg",
+      });
+      formData.append("pixel_x", x.toString());
+      formData.append("pixel_y", y.toString());
+
+      const response = await axios.post(
+        "http://192.168.1.65:5000/image_click",
+        formData
+      );
+
+      if (response.status === 200) {
+        console.log("Succesfully received image back from server");
+        const decodedImage = `data:image/jpeg;base64, ${response.data.image}`;
+        setImageUri(decodedImage);
+        setImageDone(true);
+      } else {
+        Alert.alert("Error", "Failed to receive image from server");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      Alert.alert("Error", "Failed to upload image");
+    }
+  };
+
+  /* takes image using phone camera and updates imageUri */
   const takeImage = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
 
@@ -78,6 +113,7 @@ export function NewRouteScreen() {
     }
   };
 
+  /* picks image from phone image library and updates imageUri */
   const pickImage = async () => {
     let data = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -92,6 +128,7 @@ export function NewRouteScreen() {
     }
   };
 
+  /* saves image to the 'Saved Routes' screen */
   const saveImage = async () => {
     if (imageUri) {
       try {
@@ -118,6 +155,7 @@ export function NewRouteScreen() {
     }
   };
 
+  /* helper function to save image to the 'Saved Routes' screen with a filename given by the user */
   const saveImageWithFilename = async (fileName, base64) => {
     try {
       const fileUri = FileSystem.documentDirectory + fileName + ".jpg";
@@ -135,12 +173,15 @@ export function NewRouteScreen() {
     }
   };
 
+  /* handles image click by user, sends a request to backend with the click pixel location */
   const handleImagePress = (event) => {
     const { locationX, locationY } = event.nativeEvent;
     const { width, height } = imageSize;
     const relativeX = Math.floor((locationX / 300) * width);
     const relativeY = Math.floor((locationY / 400) * height);
+    // need some var to check if it is okay to send image press?
     console.log("Image clicked at:", relativeX, relativeY);
+    sendPixelClick(imageUri, relativeX, relativeY);
   };
 
   return (
