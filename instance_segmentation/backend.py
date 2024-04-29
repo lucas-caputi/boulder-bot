@@ -1,5 +1,5 @@
 from ultralytics import YOLO
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 import cv2
 import numpy as np
 from flask import Flask, request
@@ -32,7 +32,7 @@ def predict_image(img_name, img):
         # Convert ndarray to list for masks
         masks_list = [mask.xy[0].tolist() for mask in result.masks]
 
-        # Initialize list of flags to keep track of selected holds
+        # Initialize list of flags to keep track of # of times a hold has been selected
         selected_list = [0] * len(result.boxes)
 
         # Update the databse with the converted lists
@@ -96,20 +96,62 @@ def image_click():
         masks_list = row[3]        
         selected_list = row[4]
 
-    # Check if pixel clicked is within a bounding box, if so outline/un-outline the mask
+    # Check if pixel clicked is within a bounding box, if so outline the mask appropriately
     index = find_box_index(bounding_boxes_list, float(pixel_x), float(pixel_y))
     if(index):
         # TODO: check if mask is currently selected or not, then either outline or un-outline
-        polygon = masks_list[index]                                                 # Get polygon of mask
-        polygon_flat = [int(coord) for sublist in polygon for coord in sublist]     # Turn polygon flat
-        img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))             # Convert the image from OpenCV format (BGR) to Pillow format (RGB)
-        draw = ImageDraw.Draw(img_pil)                                              # Create an ImageDraw object
-        draw.polygon(polygon_flat, outline=(0, 255, 0), width=5)                    # Draw the polygon outline with given color and thickness
-        img = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)                    # Convert the modified image back to OpenCV format (BGR)
-        img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))             # Convert the image from OpenCV format (BGR) to PIL format (RGB)  
-        selected_list[index] = 1                                                    # Update flag for this object (to keep track of what objects are outlined)
-        insert_data(img_name, bounding_boxes_list, masks_list, selected_list)       # Update database
-        img_pil.save('./image.jpg')                                                 # Update image
+        polygon = masks_list[index]
+        polygon_flat = [int(coord) for sublist in polygon for coord in sublist]
+        img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+        draw = ImageDraw.Draw(img_pil)
+        update_flag = True                    
+        
+        # If object has never been selected
+        if selected_list[index] == 0:                                               
+            draw.polygon(polygon_flat, outline=(255, 255, 255), width=5)
+        
+        # If object has been selected once before
+        elif selected_list[index] == 1:                                             
+            draw.polygon(polygon_flat, outline=(0, 255, 0), width=5)
+            bounding_box_width = bounding_boxes_list[index][2] - \
+                                 bounding_boxes_list[index][0]
+            text_position = (bounding_boxes_list[index][2] - bounding_box_width/2,
+                             bounding_boxes_list[index][3])
+            font = ImageFont.truetype("arial.ttf", 30)
+            rectangle_position = (text_position[0] - 5,
+                                  text_position[1], 
+                                  text_position[0] + 103, 
+                                  text_position[1] + 35)
+            draw.rectangle(rectangle_position, fill="white")
+            draw.text(text_position, "START", fill=(0, 255, 0), font=font)
+
+        # If object has been selected twice before
+        elif selected_list[index] == 2:                                             
+            draw.polygon(polygon_flat, outline=(255, 0, 0), width=5)
+            bounding_box_width = bounding_boxes_list[index][2] - \
+                                 bounding_boxes_list[index][0]
+            text_position = (bounding_boxes_list[index][2] 
+                             + 18 - bounding_box_width/2,                   
+                             bounding_boxes_list[index][3])
+            font = ImageFont.truetype("arial.ttf", 30)
+            rectangle_position = (bounding_boxes_list[index][2] - 5 - bounding_box_width/2,   
+                                  bounding_boxes_list[index][3], 
+                                  bounding_boxes_list[index][2] + 103 - bounding_box_width/2, 
+                                  bounding_boxes_list[index][3] + 35)
+            draw.rectangle(rectangle_position, fill="white")
+            draw.text(text_position, "END", fill=(255, 0, 0), font=font) 
+
+        # If object has already been selected thrice
+        else:
+            update_flag = False 
+
+        # If object was updated, save to file
+        if update_flag:
+            img = cv2.cvtColor(np.array(img_pil), cv2.COLOR_RGB2BGR)
+            img_pil = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))  
+            selected_list[index] += 1
+            insert_data(img_name, bounding_boxes_list, masks_list, selected_list)
+            img_pil.save('./image.jpg')
 
     # Send the image back to the client
     with open('./image.jpg', 'rb') as img_file:
