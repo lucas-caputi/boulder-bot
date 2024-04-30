@@ -53,7 +53,7 @@ def segment():
     image_file = request.files['image']
 
     # Save the received image to file directory
-    image_path = './image.jpg'
+    image_path = './orig_image.jpg'
     image_file.save(image_path)
 
     # Read the image
@@ -63,7 +63,18 @@ def segment():
     predict_image("cur_image", img)
 
     # Send the original image back to the client
-    with open('./image.jpg', 'rb') as img_file:
+    with open('./orig_image.jpg', 'rb') as img_file:
+        img_data = img_file.read()
+    encoded_img = base64.b64encode(img_data).decode('utf-8')
+    return {'image': encoded_img}
+
+# Route that reverts image back to the original image
+@app.route('/revert_image', methods=['POST'])
+def revert_image():
+    print("Received 'revert_image' route request")
+
+    # Send the original image back to the client
+    with open('./orig_image.jpg', 'rb') as img_file:
         img_data = img_file.read()
     encoded_img = base64.b64encode(img_data).decode('utf-8')
     return {'image': encoded_img}

@@ -128,6 +128,23 @@ export function NewRouteScreen() {
     }
   };
 
+  /* reverts image back to original */
+  const revertImage = async () => {
+    try {
+      const response = await axios.post(
+        "http://192.168.1.65:5000/revert_image"
+      );
+      if (response.status === 200) {
+        console.log("Succesfully received image back from server");
+        const decodedImage = `data:image/jpeg;base64, ${response.data.image}`;
+        setImageUri(decodedImage);
+        setImageDone(true);
+      } else {
+        Alert.alert("Error", "Failed to receive image from server");
+      }
+    } catch (error) {}
+  };
+
   /* saves image to the 'Saved Routes' screen */
   const saveImage = async () => {
     if (imageUri) {
@@ -227,6 +244,14 @@ export function NewRouteScreen() {
       </View>
 
       <View style={styles.buttonsContainer}>
+        {imageDone && (
+          <TouchableOpacity style={styles.button} onPress={revertImage}>
+            <Image
+              style={{ height: 50, width: 50 }}
+              source={require("../assets/undo.png")}
+            />
+          </TouchableOpacity>
+        )}
         {imageDone && (
           <TouchableOpacity style={styles.button} onPress={saveImage}>
             <Image
